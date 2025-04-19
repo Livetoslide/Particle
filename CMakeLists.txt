@@ -25,7 +25,7 @@ file(GLOB_RECURSE SRC_FILES
 )
 
 # Единый исполняемый
-add_executable(Particle ${SRC_FILES})
+add_executable(Particle ${SRC_FILES} "include/particle/shape/IEmitterShape.hpp")
 target_link_libraries(Particle PRIVATE
     glfw
     OpenGL::GL
