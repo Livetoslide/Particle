@@ -26,7 +26,7 @@ file(GLOB_RECURSE SRC_FILES
 )
 
 # Единый исполняемый
-add_executable(Particle ${SRC_FILES} "include/particle/shape/IEmitterShape.hpp" "src/shape/CircleShape.cpp" "src/shape/BoxShape.cpp" )
+add_executable(Particle ${SRC_FILES} "include/particle/shape/IEmitterShape.hpp" "src/shape/CircleShape.cpp" "src/shape/BoxShape.cpp"  "src/particles/SpriteRenderer.cpp")
 target_link_libraries(Particle PRIVATE
     glfw
     OpenGL::GL
