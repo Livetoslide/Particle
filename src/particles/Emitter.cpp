@@ -19,8 +19,8 @@ namespace particle {
             // создаём частицу с нужным pos и произвольной скоростью/жизнью
             particles_.push_back(std::make_unique<Particle>(
                 pos,
-                glm::vec2(0.0f, 1.0f), // пока просто вверх
-                3.0f                  // жизнь
+                glm::vec2(0.0f, 0.0f), // пока просто вверх
+                1.0f                  // жизнь
             ));
         }
         // старый update particles (apply modules, life, pos)
