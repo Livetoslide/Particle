@@ -1,4 +1,4 @@
-﻿#include <glad/glad.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 
@@ -12,8 +12,12 @@
 #include <particle/SizeModule.hpp>
 #include <particle/GLRenderer.hpp>
 #include <particle/ValueOverLifeModule.hpp>
+#include <particle/SpriteRenderer.hpp>
+
+#include <gtc/matrix_transform.hpp>
 
 #include <memory>
+#include <filesystem>
 
 int main() {
     // — Инициализация GLFW и GLAD —
@@ -33,46 +37,56 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glm::mat4 proj = glm::ortho(-1.0f, +1.0f, -1.0f, +1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 viewProj = proj * view;
+
     // — Настройка эмиттера —
     auto spawnStrat = std::make_shared<particle::RateSpawnStrategy>(50.0f);
     auto shape = std::make_shared<particle::CircleShape>(0.3f);
     particle::Emitter em(spawnStrat, shape);
 
-    em.addModule(std::make_shared<particle::GravityModule>());
+    //em.addModule(std::make_shared<particle::GravityModule>());
 
-    // цвет over life
     using ColKF = particle::Keyframe<glm::vec4>;
     std::vector<ColKF> colorKeys = {
-      {0.0f, {1,1,0,1}, nullptr},
-      {0.5f, {0,1,1,1}, nullptr},
-      {1.0f, {1,0,0,0}, nullptr}
+        // timeNorm,     RGBA
+        { 0.0f, {1,1,1,0.25f}, nullptr },  // при спавне — белый полупрозрачный
+        { 0.5f, {1,1,1,0.15f}, nullptr },  // середина — полупрозрачнее
+        { 1.0f, {1,1,1,0.00f}, nullptr }   // к концу — полностью прозрачный
     };
     em.addModule(std::make_shared<
         particle::ValueOverLifeModule<glm::vec4>
-    >(colorKeys, 1.0f));
+    >(colorKeys, /*maxLife=*/2.0f));
 
-    // size over life
     using SizeKF = particle::Keyframe<float>;
     std::vector<SizeKF> sizeKeys = {
-      {0.0f, 14.0f, nullptr},
-      {1.0f,  2.0f, nullptr}
+      { 0.0f, 0.05f, nullptr },  // очень мелкая при спавне
+      { 0.5f, 0.15f, nullptr },  // раздувается
+      { 1.0f, 0.25f, nullptr }   // к концу — крупный, но прозрачный
     };
     em.addModule(std::make_shared<
         particle::ValueOverLifeModule<float>
-    >(sizeKeys, 1.0f));
-
-    particle::GLRenderer renderer;
+    >(sizeKeys, /*maxLife=*/2.0f));
+;
+    particle::SpriteRenderer renderer("textures/particle.png");
+    int locViewProj = glGetUniformLocation(renderer.getShader(), "uViewProj");
 
     // — Цикл рендеринга —
-    float last = (float)glfwGetTime();
+    float lastTime = (float)glfwGetTime();
     while (!glfwWindowShouldClose(win)) {
         float now = (float)glfwGetTime();
-        float dt = now - last; last = now;
+        float dt = now - lastTime;
+        lastTime = now;
 
         em.update(dt);
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // Передаём матрицу в шейдер
+        glUseProgram(renderer.getShader());
+        glUniformMatrix4fv(locViewProj, 1, GL_FALSE, &viewProj[0][0]);
 
         em.render(renderer);
 

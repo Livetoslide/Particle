@@ -13,6 +13,7 @@ namespace particle {
 		~SpriteRenderer();
 
 		void draw(const std::vector<IParticle*>& pts) override;
+		unsigned int getShader() { return shader_; };
 
 	private:
 		unsigned int shader_, vao_, vbo_, ebo_, texture_;
