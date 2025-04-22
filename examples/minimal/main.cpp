@@ -13,6 +13,7 @@
 #include <particle/GLRenderer.hpp>
 #include <particle/ValueOverLifeModule.hpp>
 #include <particle/SpriteRenderer.hpp>
+#include <particle/NoiseModule .hpp>
 
 #include <gtc/matrix_transform.hpp>
 
@@ -42,32 +43,31 @@ int main() {
     glm::mat4 viewProj = proj * view;
 
     // — Настройка эмиттера —
-    auto spawnStrat = std::make_shared<particle::RateSpawnStrategy>(50.0f);
-    auto shape = std::make_shared<particle::CircleShape>(0.3f);
-    particle::Emitter em(spawnStrat, shape);
+    auto spawnStrat = std::make_shared<particle::RateSpawnStrategy>(20.0f);
+    auto shape = std::make_shared<particle::CircleShape>(0.2f);
+    particle::Emitter em(spawnStrat, shape, glm::vec2(0.0f, +0.2f), 2.0f);
 
-    //em.addModule(std::make_shared<particle::GravityModule>());
+    em.addModule(std::make_shared<particle::GravityModule>(glm::vec2{0.0f, -0.1f}));
 
     using ColKF = particle::Keyframe<glm::vec4>;
     std::vector<ColKF> colorKeys = {
-        // timeNorm,     RGBA
-        { 0.0f, {1,1,1,0.25f}, nullptr },  // при спавне — белый полупрозрачный
-        { 0.5f, {1,1,1,0.15f}, nullptr },  // середина — полупрозрачнее
-        { 1.0f, {1,1,1,0.00f}, nullptr }   // к концу — полностью прозрачный
+      {0.0f, {1,1,1,0.3f}, nullptr},
+      {1.0f, {1,1,1,0.0f}, nullptr}
     };
     em.addModule(std::make_shared<
         particle::ValueOverLifeModule<glm::vec4>
-    >(colorKeys, /*maxLife=*/2.0f));
+    >(colorKeys, 2.0f));
 
     using SizeKF = particle::Keyframe<float>;
     std::vector<SizeKF> sizeKeys = {
-      { 0.0f, 0.05f, nullptr },  // очень мелкая при спавне
-      { 0.5f, 0.15f, nullptr },  // раздувается
-      { 1.0f, 0.25f, nullptr }   // к концу — крупный, но прозрачный
+      {0.0f, 0.05f, nullptr},
+      {1.0f, 0.25f, nullptr}
     };
     em.addModule(std::make_shared<
         particle::ValueOverLifeModule<float>
-    >(sizeKeys, /*maxLife=*/2.0f));
+    >(sizeKeys, 2.0f));
+
+    em.addModule(std::make_shared<particle::NoiseModule>( /*magnitude=*/0.3f));
 ;
     particle::SpriteRenderer renderer("textures/particle.png");
     int locViewProj = glGetUniformLocation(renderer.getShader(), "uViewProj");
