@@ -13,32 +13,38 @@ namespace particle {
     }
 
     void Emitter::update(float dt) {
+        // 1) Спавним
         int toSpawn = spawnStrategy_->spawnCount(dt);
         for (int i = 0; i < toSpawn; ++i) {
             glm::vec2 pos = shape_->sample();
-            // создаём частицу с нужным pos и произвольной скоростью/жизнью
+            // скорость = базовая + (модули могут её менять)
             particles_.push_back(std::make_unique<Particle>(
                 pos,
-                glm::vec2(0.0f, 0.0f), // пока просто вверх
-                1.0f                  // жизнь
+                baseVelocity_,   // теперь учитываем базовую скорость
+                maxLife_
             ));
         }
-        // старый update particles (apply modules, life, pos)
+
+        // 2) Для каждой частицы применяем модули, уменьшаем life, движем
         for (auto& p : particles_) {
-            for (auto& m : modules_) m->apply(*p, dt);
+            for (auto& m : modules_)
+                m->apply(*p, dt);
             p->life() -= dt;
             p->position() += p->velocity() * dt;
         }
+
+        // 3) Удаляем «мертвые»
         particles_.erase(
             std::remove_if(particles_.begin(), particles_.end(),
-                [](const auto& p) { return p->life() <= 0; }),
+                [](auto& p) { return p->life() <= 0.0f; }),
             particles_.end()
         );
     }
 
     void Emitter::render(IRenderer& r) {
         std::vector<IParticle*> batch;
-        for (auto& u : particles_) batch.push_back(u.get());
+        for (auto& u : particles_)
+            batch.push_back(u.get());
         r.draw(batch);
     }
 
