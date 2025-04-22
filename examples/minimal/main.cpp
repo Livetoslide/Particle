@@ -13,7 +13,8 @@
 #include <particle/GLRenderer.hpp>
 #include <particle/ValueOverLifeModule.hpp>
 #include <particle/SpriteRenderer.hpp>
-#include <particle/NoiseModule .hpp>
+#include <particle/NoiseModule.hpp>
+#include <particle/BlendMode.hpp>
 
 #include <gtc/matrix_transform.hpp>
 
@@ -35,8 +36,6 @@ int main() {
 
     // — Включаем программный PointSize и блендинг —
     glEnable(GL_PROGRAM_POINT_SIZE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glm::mat4 proj = glm::ortho(-1.0f, +1.0f, -1.0f, +1.0f);
     glm::mat4 view = glm::mat4(1.0f);
@@ -67,11 +66,11 @@ int main() {
         particle::ValueOverLifeModule<float>
     >(sizeKeys, 2.0f));
 
-    em.addModule(std::make_shared<particle::NoiseModule>( /*magnitude=*/0.3f));
+    em.addModule(std::make_shared<particle::NoiseModule>( /*magnitude=*/0.1f));
 ;
     particle::SpriteRenderer renderer("textures/particle.png");
     int locViewProj = glGetUniformLocation(renderer.getShader(), "uViewProj");
-
+    renderer.setBlendMode(particle::BlendMode::Normal);
     // — Цикл рендеринга —
     float lastTime = (float)glfwGetTime();
     while (!glfwWindowShouldClose(win)) {
