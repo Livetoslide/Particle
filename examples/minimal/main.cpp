@@ -15,6 +15,7 @@
 #include <particle/SpriteRenderer.hpp>
 #include <particle/NoiseModule.hpp>
 #include <particle/BlendMode.hpp>
+#include <particle/AngularVelocityModule.hpp>
 
 #include <gtc/matrix_transform.hpp>
 
@@ -67,7 +68,7 @@ int main() {
     >(sizeKeys, 2.0f));
 
     em.addModule(std::make_shared<particle::NoiseModule>( /*magnitude=*/0.1f));
-;
+    em.addModule(std::make_shared<particle::AngularVelocityModule>(3.14f));
     particle::SpriteRenderer renderer("textures/particle.png");
     int locViewProj = glGetUniformLocation(renderer.getShader(), "uViewProj");
     renderer.setBlendMode(particle::BlendMode::Normal);
