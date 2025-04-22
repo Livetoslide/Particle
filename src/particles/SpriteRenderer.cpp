@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <gtc/matrix_transform.hpp>
 #include <iostream>
+#include "particle/BlendMode.hpp"
 
 // ¬ершинный шейдер дл€ инстанс-рендеринга спрайтов
 static const char* VSH = R"glsl(
@@ -57,6 +58,24 @@ namespace particle {
         glDeleteProgram(shader_);
         glDeleteTextures(1, &texture_);
     }
+
+    static void applyGLBlend(BlendMode m) {
+        switch (m) {
+        case BlendMode::Normal:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case BlendMode::Additive:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            break;
+        case BlendMode::Multiply:
+            glBlendFunc(GL_DST_COLOR, GL_ZERO);
+            break;
+        case BlendMode::Screen:
+            glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
+            break;
+        }
+    }
+
     void SpriteRenderer::initShaders() {
         auto compile = [&](GLenum type, const char* src) {
             unsigned sh = glCreateShader(type);
@@ -135,6 +154,9 @@ namespace particle {
             inst.push_back(p->size()); inst.push_back(0.0f);
             auto& c = p->color(); inst.push_back(c.r); inst.push_back(c.g); inst.push_back(c.b); inst.push_back(c.a);
         }
+
+        glEnable(GL_BLEND);
+        applyGLBlend(blendMode_);
 
         glUseProgram(shader_);
         glBindVertexArray(vao_);

@@ -44,6 +44,23 @@ namespace particle {
         return sh;
     }
 
+    static void applyGLBlend(BlendMode m) {
+        switch (m) {
+        case BlendMode::Normal:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case BlendMode::Additive:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            break;
+        case BlendMode::Multiply:
+            glBlendFunc(GL_DST_COLOR, GL_ZERO);
+            break;
+        case BlendMode::Screen:
+            glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
+            break;
+        }
+    }
+
     GLRenderer::GLRenderer() {
         // Компилируем и линкуем шейдеры
         unsigned vs = compileShader(GL_VERTEX_SHADER, VSH);
@@ -103,6 +120,9 @@ namespace particle {
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo_);
         glBufferSubData(GL_ARRAY_BUFFER, 0, data.size() * sizeof(float), data.data());
+
+        glEnable(GL_BLEND);
+        applyGLBlend(blendMode_);
 
         glUseProgram(shader_);
         glBindVertexArray(vao_);

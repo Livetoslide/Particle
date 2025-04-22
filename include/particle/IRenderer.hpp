@@ -1,5 +1,6 @@
 #pragma once
 #include "particle/IParticle.hpp"
+#include "particle/BlendMode.hpp"
 #include <vector>
 
 namespace particle {
@@ -8,5 +9,6 @@ namespace particle {
 	public:
 		virtual ~IRenderer() = default;
 		virtual void draw(const std::vector<IParticle*>& particles) = 0;
+		virtual void setBlendMode(BlendMode mode) = 0;
 	};
 }
