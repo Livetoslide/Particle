@@ -11,5 +11,8 @@ namespace particle {
 
 		virtual glm::vec4& color() = 0;
 		virtual float& size() = 0;
+
+		virtual float& angle() = 0;
+		virtual float& angularVelocity() = 0;
 	};
 }

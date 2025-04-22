@@ -31,6 +31,7 @@ namespace particle {
                 m->apply(*p, dt);
             p->life() -= dt;
             p->position() += p->velocity() * dt;
+            p->angle() += p->angularVelocity() * dt;
         }
 
         // 3) Удаляем «мертвые»

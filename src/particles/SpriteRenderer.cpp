@@ -151,7 +151,7 @@ namespace particle {
         inst.reserve(pts.size() * 8);
         for (auto* p : pts) {
             auto& pos = p->position(); inst.push_back(pos.x); inst.push_back(pos.y);
-            inst.push_back(p->size()); inst.push_back(0.0f);
+            inst.push_back(p->size()); inst.push_back(p->angle());
             auto& c = p->color(); inst.push_back(c.r); inst.push_back(c.g); inst.push_back(c.b); inst.push_back(c.a);
         }
 
