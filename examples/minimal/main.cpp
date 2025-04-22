@@ -83,6 +83,19 @@ int main() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        if (glfwGetKey(win, GLFW_KEY_1) == GLFW_PRESS) {
+            renderer.setBlendMode(particle::BlendMode::Normal);
+        }
+        if (glfwGetKey(win, GLFW_KEY_2) == GLFW_PRESS) {
+            renderer.setBlendMode(particle::BlendMode::Additive);
+        }
+        if (glfwGetKey(win, GLFW_KEY_3) == GLFW_PRESS) {
+            renderer.setBlendMode(particle::BlendMode::Multiply);
+        }
+        if (glfwGetKey(win, GLFW_KEY_4) == GLFW_PRESS) {
+            renderer.setBlendMode(particle::BlendMode::Screen);
+        }
+
         // Передаём матрицу в шейдер
         glUseProgram(renderer.getShader());
         glUniformMatrix4fv(locViewProj, 1, GL_FALSE, &viewProj[0][0]);
